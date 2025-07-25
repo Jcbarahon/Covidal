@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "856302609263",
+    "project_id": "covidal-app-7550f",
+    "storage_bucket": "covidal-app-7550f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:856302609263:android:d763d627ce192ebcf0be9a",
+        "android_client_info": {
+          "package_name": "com.company.covidal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAFQVStr0Sqx1vOAUIMppC3ZG-7ZD33mhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
