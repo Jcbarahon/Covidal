@@ -75,6 +75,7 @@ class _EdificioPageState extends State<EdificioPage> {
     return numeros.reduce((a, b) => a > b ? a : b) + 1;
   }
 
+//En esta función se agrega los pisos de manera ordenada de forma descendete a ascendente 
   void _agregarPiso() {
     final nuevoNumero = _obtenerSiguienteNumero();
     setState(() {
@@ -87,6 +88,7 @@ class _EdificioPageState extends State<EdificioPage> {
     });
   }
 
+// En esta función se elimina el piso, manteniendo presionado durante 2 milisegundos y se proporciona un mensaje de confirmación para su eliminación 
   void _eliminarPiso() {
     if (pisoSeleccionado == null) return;
 
@@ -142,6 +144,7 @@ class _EdificioPageState extends State<EdificioPage> {
     );
   }
 
+//En esta función se guarda los cambios realizados llamando a la función guardarEnFirestore
   void _guardarCambios() {
     _guardarEnFirestore();
   }
@@ -182,6 +185,8 @@ class _EdificioPageState extends State<EdificioPage> {
       const SnackBar(content: Text('Pisos guardados en Firestore')),
     );
   }
+
+  //En esta función se muestra mensajes de advertencia antes de salir
 
   Future<void> _confirmarSalir(VoidCallback accion) async {
     if (_hayCambios) {
