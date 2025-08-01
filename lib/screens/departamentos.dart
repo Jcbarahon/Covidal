@@ -12,18 +12,20 @@ class DepartamentosPage extends StatefulWidget {
   State<DepartamentosPage> createState() => _DepartamentosPageState();
 }
 
+// Creamos el estado de la clase DepartamentosPage A y B
 class _DepartamentosPageState extends State<DepartamentosPage> {
   List<String> seccionA = [];
   List<String> seccionB = [];
   String? seleccionado;
   bool _hayCambios = false;
-
+  // Inicializamos el estado de la clase DepartamentosPage A y B
   @override
   void initState() {
     super.initState();
     _cargarDepartamentos();
   }
 
+  //  Cargamos los departamentos de la colección de Firestore
   Future<void> _cargarDepartamentos() async {
     final ref = FirebaseFirestore.instance
         .collection('edificios')
@@ -33,7 +35,7 @@ class _DepartamentosPageState extends State<DepartamentosPage> {
         .collection('departamentos');
 
     final snapshot = await ref.get();
-
+    //  Inicializamos las listas de departamentos A y B
     List<String> a = [];
     List<String> b = [];
 
@@ -52,6 +54,7 @@ class _DepartamentosPageState extends State<DepartamentosPage> {
     });
   }
 
+  //  Agregamos un departamento a la lista de departamentos A o B
   void _agregarDepartamento(String seccion) {
     setState(() {
       final lista = seccion == 'A' ? seccionA : seccionB;
@@ -64,13 +67,14 @@ class _DepartamentosPageState extends State<DepartamentosPage> {
           maxNumero = numero;
         }
       }
-
+      //  Obtenemos el número máximo actual en la lista de departamentos A o B
       final nuevoNombre = '$seccion${maxNumero + 1}';
       lista.add(nuevoNombre);
       _hayCambios = true;
     });
   }
 
+  //  Eliminamos un departamento de la lista de departamentos A o B
   void _eliminarDepartamento() async {
     if (seleccionado == null) return;
 
@@ -93,6 +97,7 @@ class _DepartamentosPageState extends State<DepartamentosPage> {
     }
   }
 
+  //  Guardamos los cambios en la colección de Firestore
   Future<void> _guardarDepartamentos() async {
     final ref = FirebaseFirestore.instance
         .collection('edificios')
