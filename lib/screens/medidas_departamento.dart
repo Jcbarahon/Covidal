@@ -277,7 +277,7 @@ class _MedidasDepartamentoPageState extends State<MedidasDepartamentoPage> {
 
       String nuevoEstadoPiso;
 
-      // Si seleccionas "inactivo", forzar el estado del piso como inactivo también
+      // Selección de estados para cada piso
       if (estadoSeleccionado == 'inactivo') {
         nuevoEstadoPiso = 'inactivo';
       } else {
@@ -286,7 +286,7 @@ class _MedidasDepartamentoPageState extends State<MedidasDepartamentoPage> {
           nuevoEstadoPiso = 'listo';
         }
       }
-
+     //Actulizamos el estado del piso en la colección de Firestore
       await FirebaseFirestore.instance
           .collection('edificios')
           .doc('principal')
@@ -687,6 +687,8 @@ class _MedidasDepartamentoPageState extends State<MedidasDepartamentoPage> {
           ),
         ],
       ),
+
+      //Agregamos un botón de navegación en la parte inferior de la pantalla (inactivo,listo,activo)
       bottomNavigationBar: Transform.translate(
         offset: const Offset(0, -20),
         child: ClipRRect(
@@ -706,6 +708,7 @@ class _MedidasDepartamentoPageState extends State<MedidasDepartamentoPage> {
                 'inactivo',
                 'listo',
               ].indexOf(estadoSeleccionado),
+//Creamos los botones de navegación
 
               destinations: [
                 _buildEstadoButton(
