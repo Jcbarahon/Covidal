@@ -75,7 +75,7 @@ class _EdificioPageState extends State<EdificioPage> {
     return numeros.reduce((a, b) => a > b ? a : b) + 1;
   }
 
-//En esta función se agrega los pisos de manera ordenada de forma descendete a ascendente 
+  //En esta función se agrega los pisos de manera ordenada de forma descendete a ascendente
   void _agregarPiso() {
     final nuevoNumero = _obtenerSiguienteNumero();
     setState(() {
@@ -88,7 +88,7 @@ class _EdificioPageState extends State<EdificioPage> {
     });
   }
 
-// En esta función se elimina el piso, manteniendo presionado durante 2 milisegundos y se proporciona un mensaje de confirmación para su eliminación 
+  // En esta función se elimina el piso, manteniendo presionado durante 2 milisegundos y se proporciona un mensaje de confirmación para su eliminación
   void _eliminarPiso() {
     if (pisoSeleccionado == null) return;
 
@@ -144,7 +144,7 @@ class _EdificioPageState extends State<EdificioPage> {
     );
   }
 
-//En esta función se guarda los cambios realizados llamando a la función guardarEnFirestore
+  //En esta función se guarda los cambios realizados llamando a la función guardarEnFirestore
   void _guardarCambios() {
     _guardarEnFirestore();
   }
@@ -367,6 +367,7 @@ class _EdificioPageState extends State<EdificioPage> {
                     ],
                   ),
                 ),
+                // Creamos la grilla de pisos con su respectiva animacion y estilos
                 Container(
                   width: double.infinity,
                   height: 14,
@@ -382,6 +383,7 @@ class _EdificioPageState extends State<EdificioPage> {
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        // Creamos los indicadores de color para cada estado de piso
                         children: const [
                           _ColorIndicadorFila(
                             color: Color(0xFF88BFFF),
@@ -399,6 +401,7 @@ class _EdificioPageState extends State<EdificioPage> {
                           ),
                         ],
                       ),
+                      // Separador entre los estados de piso
                       const SizedBox(width: 20),
                       Expanded(
                         child: Wrap(
@@ -422,6 +425,7 @@ class _EdificioPageState extends State<EdificioPage> {
                               ).firstMatch(nombre);
                               texto = match != null ? match.group(1)! : nombre;
                             }
+                            // Color de fondo dependiendo del estado
 
                             Color fondo;
                             switch (estado) {
@@ -436,7 +440,7 @@ class _EdificioPageState extends State<EdificioPage> {
                                 fondo = const Color(0xFFE04747);
                                 break;
                             }
-
+                            // Creamos el indicador de color para cada piso
                             return Container(
                               width: 30,
                               height: 30,
@@ -484,6 +488,7 @@ class _BotonAccion extends StatefulWidget {
   State<_BotonAccion> createState() => _BotonAccionState();
 }
 
+// Estado del botón animado
 class _BotonAccionState extends State<_BotonAccion>
     with SingleTickerProviderStateMixin {
   double _scale = 1.0;
@@ -496,6 +501,7 @@ class _BotonAccionState extends State<_BotonAccion>
     widget.onTap();
   }
 
+  // Creamos el botón animado
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -516,6 +522,7 @@ class _BotonAccionState extends State<_BotonAccion>
               width: 1,
             ),
           ),
+          // Creamos el contenido del botón
           child: Column(
             children: [
               Image.asset(widget.iconPath, height: 35, fit: BoxFit.contain),
@@ -622,7 +629,7 @@ class _ColorIndicadorFila extends StatelessWidget {
   final String label;
 
   const _ColorIndicadorFila({required this.color, required this.label});
-
+  // Creamos los círculos de color
   @override
   Widget build(BuildContext context) {
     return Row(
