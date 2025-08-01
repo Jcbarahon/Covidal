@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'medidas_departamento.dart';
 
+//Creamos la clase DepartamentosPage
 class DepartamentosPage extends StatefulWidget {
   final String nombrePiso;
   const DepartamentosPage({required this.nombrePiso, super.key});

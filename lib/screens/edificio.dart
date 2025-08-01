@@ -291,7 +291,7 @@ class _EdificioPageState extends State<EdificioPage> {
                               final piso = listaParaMostrar[index];
                               final nombre = piso['nombre'];
                               final seleccionado = _esSeleccionado(nombre);
-
+//Funcionalidad para que al hacer click se dirija al departamento seleccionado
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 2,
