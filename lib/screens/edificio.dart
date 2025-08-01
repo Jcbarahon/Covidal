@@ -227,6 +227,7 @@ class _EdificioPageState extends State<EdificioPage> {
     } else {
       accion();
     }
+
   }
 
   bool _esSeleccionado(String piso) {
@@ -367,6 +368,7 @@ class _EdificioPageState extends State<EdificioPage> {
                     ],
                   ),
                 ),
+                
                 Container(
                   width: double.infinity,
                   height: 14,
