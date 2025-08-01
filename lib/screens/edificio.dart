@@ -227,6 +227,7 @@ class _EdificioPageState extends State<EdificioPage> {
     } else {
       accion();
     }
+
   }
 
   bool _esSeleccionado(String piso) {
@@ -290,7 +291,7 @@ class _EdificioPageState extends State<EdificioPage> {
                               final piso = listaParaMostrar[index];
                               final nombre = piso['nombre'];
                               final seleccionado = _esSeleccionado(nombre);
-
+//Funcionalidad para que al hacer click se dirija al departamento seleccionado
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 2,
@@ -367,7 +368,7 @@ class _EdificioPageState extends State<EdificioPage> {
                     ],
                   ),
                 ),
-                // Creamos la grilla de pisos con su respectiva animacion y estilos
+
                 Container(
                   width: double.infinity,
                   height: 14,
@@ -622,6 +623,7 @@ class _PisoItemAnimadoState extends State<_PisoItemAnimado> {
     );
   }
 }
+
 
 // CÍRCULOS DE COLOR
 class _ColorIndicadorFila extends StatelessWidget {
