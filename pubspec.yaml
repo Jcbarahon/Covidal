@@ -37,6 +37,11 @@ dependencies:
   firebase_core:
   cloud_firestore:
   crypto: 
+  pdf: ^3.11.1            # para crear PDF
+  printing: ^5.10.10       # para guardar o imprimir PDF
+  excel: ^2.0.0            # para crear archivos Excel
+  path_provider: ^2.0.14   # para guardar archivos en dispositivo
+  open_file: ^3.2.1
 
 dev_dependencies:
   flutter_test:
@@ -84,6 +89,10 @@ flutter:
       - assets/images/agregar-usuario.png
       - assets/images/borrar-usuario.png
       - assets/images/editar-usuario.png
+      - assets/images/excel.png
+      - assets/images/pdf.png
+      - assets/images/Logo.png
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
