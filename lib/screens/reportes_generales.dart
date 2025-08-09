@@ -17,6 +17,7 @@ class ReportesGeneralesPage extends StatefulWidget {
   State<ReportesGeneralesPage> createState() => _ReportesGeneralesPageState();
 }
 
+// GENERAR EXCEL ALUMINIO
 Future<void> generarExcelAluminio(String piso) async {
   final firestore = FirebaseFirestore.instance;
   final pisoId = piso.toLowerCase().replaceAll(' ', '_');
@@ -31,11 +32,8 @@ Future<void> generarExcelAluminio(String piso) async {
           .get();
 
   final excel = Excel.createExcel();
-  // Eliminar hoja por defecto "Sheet1"
-
   final Sheet sheet = excel['Sheet1'];
 
-  // Escribir encabezados
   sheet.appendRow(['Departamento', 'Medida #', 'Campo', 'Valor']);
 
   for (var departamentoDoc in departamentosSnapshot.docs) {
@@ -65,7 +63,6 @@ Future<void> generarExcelAluminio(String piso) async {
     if (aluminioList != null && aluminioList.isNotEmpty) {
       for (int i = 0; i < aluminioList.length; i++) {
         final aluminio = aluminioList[i] as Map<String, dynamic>;
-
         final alto = aluminio['alto']?.toString() ?? '-';
         final ancho = aluminio['ancho']?.toString() ?? '-';
 
@@ -78,27 +75,23 @@ Future<void> generarExcelAluminio(String piso) async {
     }
   }
 
-  // Guardar archivo en carpeta temporal
   final outputDir = await getTemporaryDirectory();
   final filePath = '${outputDir.path}/reporte_aluminio_$pisoId.xlsx';
 
   final fileBytes = excel.encode();
   if (fileBytes == null) {
-    print('Error al generar archivo Excel');
+    print('Error al generar archivo Excel aluminio');
     return;
   }
 
   final file = File(filePath);
   await file.writeAsBytes(fileBytes);
+  print('Archivo Excel aluminio generado en: $filePath');
 
-  print('Archivo Excel generado en: $filePath');
-
-  // Abrir archivo automáticamente
-  await OpenFile.open(
-    filePath,
-  ); // Aquí puedes abrir o compartir el archivo con paquetes adicionales si quieres
+  await OpenFile.open(filePath);
 }
 
+// GENERAR PDF ALUMINIO
 Future<void> generarPdfAluminio(String piso) async {
   final firestore = FirebaseFirestore.instance;
   final pisoId = piso.toLowerCase().replaceAll(' ', '_');
@@ -113,12 +106,7 @@ Future<void> generarPdfAluminio(String piso) async {
           .get();
 
   final List<List<String>> filas = [];
-  filas.add([
-    'Departamento',
-    'Medida #',
-    'Campo',
-    'Valor',
-  ]); // Añadí columna índice
+  filas.add(['Departamento', 'Medida #', 'Campo', 'Valor']);
 
   for (var departamentoDoc in departamentosSnapshot.docs) {
     final departamentoId = departamentoDoc.id;
@@ -147,7 +135,6 @@ Future<void> generarPdfAluminio(String piso) async {
     if (aluminioList != null && aluminioList.isNotEmpty) {
       for (int i = 0; i < aluminioList.length; i++) {
         final aluminio = aluminioList[i] as Map<String, dynamic>;
-
         final alto = aluminio['alto']?.toString() ?? '-';
         final ancho = aluminio['ancho']?.toString() ?? '-';
 
@@ -164,29 +151,195 @@ Future<void> generarPdfAluminio(String piso) async {
 
   pdf.addPage(
     pw.Page(
-      build: (context) {
-        return pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text(
-              'Reporte de Aluminio - $piso',
-              style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-            ),
-            pw.SizedBox(height: 20),
-            pw.Table.fromTextArray(
-              data: filas,
-              headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
-              headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
-              cellAlignment: pw.Alignment.centerLeft,
-            ),
-          ],
-        );
-      },
+      build:
+          (context) => pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Reporte de Aluminio - $piso',
+                style: pw.TextStyle(
+                  fontSize: 20,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Table.fromTextArray(
+                data: filas,
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
+                cellAlignment: pw.Alignment.centerLeft,
+              ),
+            ],
+          ),
     ),
   );
 
   final output = await getTemporaryDirectory();
   final file = File("${output.path}/reporte_aluminio_$pisoId.pdf");
+  await file.writeAsBytes(await pdf.save());
+
+  await Printing.layoutPdf(onLayout: (format) => pdf.save());
+}
+
+// GENERAR EXCEL VIDRIO
+Future<void> generarExcelVidrio(String piso) async {
+  final firestore = FirebaseFirestore.instance;
+  final pisoId = piso.toLowerCase().replaceAll(' ', '_');
+
+  final departamentosSnapshot =
+      await firestore
+          .collection('edificios')
+          .doc('principal')
+          .collection('pisos')
+          .doc(pisoId)
+          .collection('departamentos')
+          .get();
+
+  final excel = Excel.createExcel();
+  final Sheet sheet = excel['Sheet1'];
+
+  sheet.appendRow(['Departamento', 'Medida #', 'Campo', 'Valor']);
+
+  for (var departamentoDoc in departamentosSnapshot.docs) {
+    final departamentoId = departamentoDoc.id;
+
+    final detallesDoc =
+        await firestore
+            .collection('edificios')
+            .doc('principal')
+            .collection('pisos')
+            .doc(pisoId)
+            .collection('departamentos')
+            .doc(departamentoId)
+            .collection('detalles')
+            .doc('medidas')
+            .get();
+
+    if (!detallesDoc.exists) {
+      sheet.appendRow([departamentoId, '-', 'Alto', '-']);
+      sheet.appendRow([departamentoId, '-', 'Ancho', '-']);
+      continue;
+    }
+
+    final data = detallesDoc.data() ?? {};
+    final List<dynamic>? vidrioList = data['vidrio'];
+
+    if (vidrioList != null && vidrioList.isNotEmpty) {
+      for (int i = 0; i < vidrioList.length; i++) {
+        final vidrio = vidrioList[i] as Map<String, dynamic>;
+        final alto = vidrio['alto']?.toString() ?? '-';
+        final ancho = vidrio['ancho']?.toString() ?? '-';
+
+        sheet.appendRow([departamentoId, (i + 1).toString(), 'Alto', alto]);
+        sheet.appendRow([departamentoId, (i + 1).toString(), 'Ancho', ancho]);
+      }
+    } else {
+      sheet.appendRow([departamentoId, '-', 'Alto', '-']);
+      sheet.appendRow([departamentoId, '-', 'Ancho', '-']);
+    }
+  }
+
+  final outputDir = await getTemporaryDirectory();
+  final filePath = '${outputDir.path}/reporte_vidrio_$pisoId.xlsx';
+
+  final fileBytes = excel.encode();
+  if (fileBytes == null) {
+    print('Error al generar archivo Excel vidrio');
+    return;
+  }
+
+  final file = File(filePath);
+  await file.writeAsBytes(fileBytes);
+  print('Archivo Excel vidrio generado en: $filePath');
+
+  await OpenFile.open(filePath);
+}
+
+// GENERAR PDF VIDRIO
+Future<void> generarPdfVidrio(String piso) async {
+  final firestore = FirebaseFirestore.instance;
+  final pisoId = piso.toLowerCase().replaceAll(' ', '_');
+
+  final departamentosSnapshot =
+      await firestore
+          .collection('edificios')
+          .doc('principal')
+          .collection('pisos')
+          .doc(pisoId)
+          .collection('departamentos')
+          .get();
+
+  final List<List<String>> filas = [];
+  filas.add(['Departamento', 'Medida #', 'Campo', 'Valor']);
+
+  for (var departamentoDoc in departamentosSnapshot.docs) {
+    final departamentoId = departamentoDoc.id;
+
+    final detallesDoc =
+        await firestore
+            .collection('edificios')
+            .doc('principal')
+            .collection('pisos')
+            .doc(pisoId)
+            .collection('departamentos')
+            .doc(departamentoId)
+            .collection('detalles')
+            .doc('medidas')
+            .get();
+
+    if (!detallesDoc.exists) {
+      filas.add([departamentoId, '-', 'Alto', '-']);
+      filas.add([departamentoId, '-', 'Ancho', '-']);
+      continue;
+    }
+
+    final data = detallesDoc.data() ?? {};
+    final List<dynamic>? vidrioList = data['vidrio'];
+
+    if (vidrioList != null && vidrioList.isNotEmpty) {
+      for (int i = 0; i < vidrioList.length; i++) {
+        final vidrio = vidrioList[i] as Map<String, dynamic>;
+        final alto = vidrio['alto']?.toString() ?? '-';
+        final ancho = vidrio['ancho']?.toString() ?? '-';
+
+        filas.add([departamentoId, (i + 1).toString(), 'Alto', alto]);
+        filas.add([departamentoId, (i + 1).toString(), 'Ancho', ancho]);
+      }
+    } else {
+      filas.add([departamentoId, '-', 'Alto', '-']);
+      filas.add([departamentoId, '-', 'Ancho', '-']);
+    }
+  }
+
+  final pdf = pw.Document();
+
+  pdf.addPage(
+    pw.Page(
+      build:
+          (context) => pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Reporte de Vidrio - $piso',
+                style: pw.TextStyle(
+                  fontSize: 20,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 20),
+              pw.Table.fromTextArray(
+                data: filas,
+                headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                headerDecoration: pw.BoxDecoration(color: PdfColors.grey300),
+                cellAlignment: pw.Alignment.centerLeft,
+              ),
+            ],
+          ),
+    ),
+  );
+
+  final output = await getTemporaryDirectory();
+  final file = File("${output.path}/reporte_vidrio_$pisoId.pdf");
   await file.writeAsBytes(await pdf.save());
 
   await Printing.layoutPdf(onLayout: (format) => pdf.save());
@@ -201,7 +354,7 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
   void initState() {
     super.initState();
     cargarPisosDesdeFirestore();
-    getDepartamentos("piso_4");
+    getDepartamentos("piso_4"); // opcional para debug
   }
 
   Future<void> cargarPisosDesdeFirestore() async {
@@ -209,11 +362,9 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
       final snapshot =
           await FirebaseFirestore.instance
               .collection('edificios')
-              .doc('principal') // Cambia si usas otro ID
+              .doc('principal')
               .collection('pisos')
-              .orderBy(
-                'orden',
-              ) // opcional, para ordenar por campo orden si tienes
+              .orderBy('orden')
               .get();
 
       final listaPisos =
@@ -221,7 +372,6 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
 
       setState(() {
         pisos = listaPisos;
-        // Si no hay selección previa, asignar el primer piso
         if (pisos.isNotEmpty) {
           pisoAluminio ??= pisos[0];
           pisoVidrio ??= pisos[0];
@@ -247,9 +397,7 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         centerTitle: true,
         title: const Text(
@@ -288,6 +436,28 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
                 pisoAluminio = valor;
               });
             },
+            onExcelTap: () async {
+              if (pisoAluminio != null) {
+                await generarExcelAluminio(pisoAluminio!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Por favor selecciona un piso.'),
+                  ),
+                );
+              }
+            },
+            onPdfTap: () async {
+              if (pisoAluminio != null) {
+                await generarPdfAluminio(pisoAluminio!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Por favor selecciona un piso.'),
+                  ),
+                );
+              }
+            },
           ),
           const Divider(color: Color(0xFFD9D9D9), thickness: 10),
           _buildSeccion(
@@ -298,6 +468,28 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
               setState(() {
                 pisoVidrio = valor;
               });
+            },
+            onExcelTap: () async {
+              if (pisoVidrio != null) {
+                await generarExcelVidrio(pisoVidrio!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Por favor selecciona un piso.'),
+                  ),
+                );
+              }
+            },
+            onPdfTap: () async {
+              if (pisoVidrio != null) {
+                await generarPdfVidrio(pisoVidrio!);
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Por favor selecciona un piso.'),
+                  ),
+                );
+              }
             },
           ),
           const Divider(color: Color(0xFFD9D9D9), thickness: 10),
@@ -316,7 +508,7 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
                     end: Alignment.bottomCenter,
                     colors: [
                       Color.fromARGB(255, 37, 150, 211),
-                      Color(0xFFE04747), // rosado-lila abajo
+                      Color(0xFFE04747),
                     ],
                   ),
                 ),
@@ -334,6 +526,8 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
     required String? pisoSeleccionado,
     required List<String> pisos,
     required ValueChanged<String?> onPisoChanged,
+    required VoidCallback onExcelTap,
+    required VoidCallback onPdfTap,
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -374,30 +568,12 @@ class _ReportesGeneralesPageState extends State<ReportesGeneralesPage> {
               ),
               const Spacer(),
               GestureDetector(
-                onTap: () async {
-                  if (pisoAluminio != null) {
-                    await generarExcelAluminio(pisoAluminio!);
-                  } else {
-                    // Opcional: mostrar mensaje que no hay piso seleccionado
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Por favor selecciona un piso.')),
-                    );
-                  }
-                },
+                onTap: onExcelTap,
                 child: Image.asset('assets/images/excel.png', height: 40),
               ),
               const SizedBox(width: 12),
               GestureDetector(
-                onTap: () async {
-                  if (pisoAluminio != null) {
-                    await generarPdfAluminio(pisoAluminio!);
-                  } else {
-                    // Opcional: mostrar mensaje que no hay piso seleccionado
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Por favor selecciona un piso.')),
-                    );
-                  }
-                },
+                onTap: onPdfTap,
                 child: Image.asset('assets/images/pdf.png', height: 40),
               ),
             ],
