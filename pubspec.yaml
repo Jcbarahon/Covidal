@@ -42,11 +42,18 @@ dependencies:
   excel: ^2.0.0            # para crear archivos Excel
   path_provider: ^2.0.14   # para guardar archivos en dispositivo
   open_file: ^3.2.1
+  intl: ^0.18.1 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   fake_cloud_firestore: ^2.5.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/oficina.png"
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -55,7 +62,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
-  intl: ^0.18.1 # Para formatear fechas
+  # Para formatear fechas
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -94,6 +101,8 @@ flutter:
       - assets/images/excel.png
       - assets/images/pdf.png
       - assets/images/Logo.png
+      - assets/icon/logo.png
+      - assets/icon/oficina.png
 
 
   # An image asset can refer to one or more resolution-specific "variants", see
